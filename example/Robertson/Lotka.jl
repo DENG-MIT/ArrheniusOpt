@@ -1,4 +1,4 @@
-casename = "lotka"
+casename = "Lotka"
 
 # the ODE function
 function f(u,p,t)

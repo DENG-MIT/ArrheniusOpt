@@ -1,13 +1,15 @@
 include("header.jl")
 
-# include("Lotka.jl")
+include("Lotka.jl")
 # include("backsolveAdjoint.jl")
-# include("interpolatingAdjoint.jl")
-
-include("Robertson.jl")
 include("interpolatingAdjoint.jl")
+# include("discreteAdjoint.jl")
 
-function train(p_init, y_true; n_epoch=300, opt = ADAMW(0.1,(0.9,0.999),1e-6), doplot=false)
+# include("Robertson.jl")
+# include("interpolatingAdjoint.jl")
+# include("discreteAdjoint.jl")
+
+function train(p_init, y_true; n_epoch=100, opt = ADAMW(0.1,(0.9,0.999),1e-6), doplot=false)
     p_pred = deepcopy(p_init);
     y_pred = predict(p_pred)
     losses_y = Vector{Float64}([loss(p_init; y_train=y_true)]);
@@ -38,9 +40,9 @@ function train(p_init, y_true; n_epoch=300, opt = ADAMW(0.1,(0.9,0.999),1e-6), d
 end
 
 # initialize
-noise_level = 1e-1;
+noise_level = 1e-3;
 rng = MersenneTwister(Int32(floor(1e7*noise_level)));
-p_init = exp.(rand(rng, length(p_true)) .- 0.5) .* p_true;
+p_init = exp.(rand(rng, length(p_true))*2 .- 1) .* p_true;
 y_init = predict(p_init);
 y_noise = y_true + noise_level .* (rand(rng, length(y0), length(tsteps)).-0.5) .* scale;
 h = valid(tsteps, y_noise, y_init; xscale=xscale)
@@ -51,8 +53,10 @@ Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_init.svg", casename, noi
 # Plots.savefig(h, "figures/Lotka_AdjointState_init.svg")
 
 # # time performance
-# @time grad_ad = Flux.gradient(x -> loss(x), p_init)[1];
-# @time grad_adj = grad_adjoint(p_init, y_init, y_true, doplot=false);
+# @time grad_ad = Flux.gradient(x -> loss(x; y_train=y_true), p_init)[1];
+# @time grad_adj = grad_adjoint(p_init, y_init, y_true; doplot=false);
+# @show grad_ad';
+# @show grad_adj';
 
 # training
 losses_y, history_p = train(p_init, y_noise; n_epoch=n_epoch);

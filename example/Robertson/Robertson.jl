@@ -44,6 +44,6 @@ weights = [1, 2e4, 1];
 xscale = :log10;
 
 # for training
-n_epoch = 300;
+n_epoch = 100;
 
 println("[info] Robertson ODE loaded")

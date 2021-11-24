@@ -21,7 +21,7 @@ function loss(p; y_train=y_true)
     return sum(abs2, (predict(p) - y_train) ./ scale) / length(y_train);
 end
 
-function train(p_init, y_noise; i_exp=1, n_epoch=300, opt = ADAMW(0.1,(0.9,0.999),1e-6))
+function train(p_init, y_noise; i_exp=1, n_epoch=100, opt = ADAMW(0.1,(0.9,0.999),1e-6))
     p_pred = deepcopy(p_init);
     y_pred = predict(p_pred)
     losses_y = Vector{Float64}([loss(p_init; y_train=y_noise)]);

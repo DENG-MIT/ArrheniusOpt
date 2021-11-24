@@ -29,11 +29,13 @@ function grad_adjoint(p_pred, y_pred, y_true)
     at_t = zeros(1)
     aug_t = vcat(au_t, aθ_t, at_t);
     aug_prob = ODEProblem(aug_ode!, aug_t, reverse(tspan), p_pred);
+    denom = scale .* scale * length(y_true);
     for i in range(length(tsteps),2,step=-1)
         tspan_i = (tsteps[i],tsteps[i-1]);
-        aug_t[1:Nu] += 2*(y_pred[:,i] .- y_true[:,i]) ./ scale;
-        aug_u = solve(aug_prob, solver, u0=aug_t, tspan=tspan_i, p=p_pred);
-        aug_t = aug_u[:,end]
+        aug_t[1:Nu] += 2*(y_pred[:,i] .- y_true[:,i]) ./ denom;
+        aug_sol = solve(aug_prob, solver, u0=aug_t, tspan=tspan_i, p=p_pred);
+        aug_u = Array(aug_sol);
+        aug_t = aug_u[:,end];
     end
     return aug_t[Nu+1:Nu+Np]
 end
