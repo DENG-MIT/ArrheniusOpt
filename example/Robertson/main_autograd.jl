@@ -21,7 +21,7 @@ function loss(p; y_train=y_true)
     return sum(abs2, (predict(p) - y_train) ./ scale) / length(y_train);
 end
 
-function train(p_init, y_noise; i_exp=1, n_epoch=100, opt = ADAMW(0.1,(0.9,0.999),1e-6))
+function train(p_init, y_noise; n_epoch=100, opt = ADAMW(0.1,(0.9,0.999),1e-6))
     p_pred = deepcopy(p_init);
     y_pred = predict(p_pred)
     losses_y = Vector{Float64}([loss(p_init; y_train=y_noise)]);
@@ -49,7 +49,7 @@ y_noise = y_true + noise_level .* (rand(rng, length(y0), length(tsteps)).-0.5) .
 p_init = exp.(rand(rng, length(p_true)) .* 2 .- 1);
 y_init = predict(p_init);
 h = valid(tsteps, y_noise, y_init; xscale=xscale);
-Plots.savefig(h, string(@sprintf("figures/Robertson_noise=%.0e_init.svg", noise_level)));
+Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_init.svg", casename, noise_level)));
 
 # training
 losses_y, history_p = train(p_init, y_noise; n_epoch=300);
@@ -61,10 +61,10 @@ plot!(losses_y, yscale=:log10, line=(1, :solid), color=:black);
 h2 = plot(xlabel="Epochs", ylabel="p loss", size=(400,200), legend=false);
 plot!(losses_p, yscale=:log10, line=(1, :solid), color=:black);
 h = plot(h1, h2, layout=(2,1), size=(400,400), framestyle=:box);
-Plots.savefig(h, string(@sprintf("figures/Robertson_noise=%.0e_loss.svg", noise_level)));
+Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_loss.svg", casename, noise_level)));
 
 # prediction
 p_pred = history_p[end];
 y_pred = predict(p_pred);
 h = valid(tsteps, y_noise, y_pred; xscale=xscale);
-Plots.savefig(h, string(@sprintf("figures/Robertson_noise=%.0e_pred.svg", noise_level)));
+Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_pred.svg", casename, noise_level)));
