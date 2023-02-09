@@ -31,6 +31,7 @@ $$
 The adjoint sensitivity method is implemented in folder `example/Robertson` with three different  variants:
 
 + `backsolveAdjoint.jl`: Direct integration of the augmented adjoint states
+
   $$
   \boldsymbol a_{aug}(t) = [\boldsymbol u(t), \boldsymbol a_u(t), \boldsymbol a_\theta(t), \boldsymbol a_t(t)]
   $$
