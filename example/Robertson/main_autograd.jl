@@ -41,18 +41,18 @@ function train(p_init, y_noise; n_epoch=100, opt = ADAMW(0.1,(0.9,0.999),1e-6))
     return losses_y, history_p;
 end
 
-noise_level = 1e-3;
+noise_level = 1e-1;
 rng = MersenneTwister(Int32(floor(1e7*noise_level)));
 y_noise = y_true + noise_level .* (rand(rng, length(y0), length(tsteps)).-0.5) .* scale;
 
 # initialize
-p_init = exp.(rand(rng, length(p_true)) .* 2 .- 1);
+p_init = exp.((rand(rng, length(p_true)) .* 2 .- 1) .* 2);
 y_init = predict(p_init);
 h = valid(tsteps, y_noise, y_init; xscale=xscale);
 Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_init.svg", casename, noise_level)));
 
 # training
-losses_y, history_p = train(p_init, y_noise; n_epoch=300);
+losses_y, history_p = train(p_init, y_noise; n_epoch=200);
 losses_p = vcat(sum(abs2.(hcat(history_p...) .- p_true), dims=1)...);
 
 # y & p loss
@@ -68,3 +68,8 @@ p_pred = history_p[end];
 y_pred = predict(p_pred);
 h = valid(tsteps, y_noise, y_pred; xscale=xscale);
 Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_pred.svg", casename, noise_level)));
+
+# comparison
+h = compare_Robertson(tsteps, y_noise, y_init, y_pred; xscale=xscale)
+h.savefig(string(@sprintf("figures/%s_noise=%.0e_comp.svg", casename, noise_level)), dpi=600);
+display(h)

@@ -46,7 +46,8 @@ function grad_adjoint(p_pred, y_pred, y_true; doplot=false)
         end
     end
     if doplot==true
-        h = plot(title="Adjoint State", xlabel="t [s]")
+        h = plot(title="Adjoint State", xlabel="t [s]",
+                palette=palette(:darktest, length(weights)))
         for (i,ti) in enumerate(t_arr)
             plot!(ti, au_arr[i]', label="", xscale=xscale)
         end

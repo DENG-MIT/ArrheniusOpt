@@ -1,10 +1,10 @@
 include("header.jl")
 
 include("Lotka.jl")
-# include("backsolveAdjoint.jl") # not working for Robertson
+include("backsolveAdjoint.jl") # not working for Robertson
 # include("discreteAdjoint.jl")
-solver = KenCarp4()
-include("interpolatingAdjoint.jl")
+# solver = KenCarp4()
+# include("interpolatingAdjoint.jl")
 
 # include("Robertson.jl")
 # include("discreteAdjoint.jl")
@@ -41,16 +41,16 @@ function train(p_init, y_true; n_epoch=100, opt = ADAMW(0.1,(0.9,0.999),1e-6), d
 end
 
 # initialize
-noise_level = 1e-2;
+noise_level = 1e-1;
 rng = MersenneTwister(Int32(floor(1e7*noise_level)));
-p_init = exp.(rand(rng, length(p_true))*1 .- 0.5) .* p_true;
+p_init = exp.((rand(rng, length(p_true))*1 .- 0.5) * 2) .* p_true;
 y_init = predict(p_init);
 y_noise = y_true + noise_level .* (rand(rng, length(y0), length(tsteps)).-0.5) .* scale;
 h = valid(tsteps, y_noise, y_init; xscale=xscale)
 Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_init.svg", casename, noise_level)));
 
 # # show adjoint state
-grad_adj, h = grad_adjoint(p_init, y_init, y_true, doplot=true);
+grad_adj, h = grad_adjoint(p_init, y_init, y_noise, doplot=true);
 Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_AdjointState.svg", casename, noise_level)))
 
 # # time performance
@@ -76,3 +76,10 @@ p_pred = history_p[end];
 y_pred = predict(p_pred);
 h = valid(tsteps, y_noise, y_pred; xscale=xscale);
 Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_pred.svg", casename, noise_level)));
+
+# # show adjoint state
+grad_adj, h = grad_adjoint(p_true, y_true, y_noise, doplot=true);
+Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_AdjointState_trained.svg", casename, noise_level)))
+
+# h = compare_Robertson(tsteps, y_noise, y_init, y_pred; xscale=xscale)
+# Plots.savefig(h, string(@sprintf("figures/%s_noise=%.0e_comp.svg", casename, noise_level)));

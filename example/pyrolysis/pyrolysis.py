@@ -9,7 +9,7 @@ import cantera as ct
 
 np.random.seed(1)
 
-gas = ct.Solution('../../mechanism/JP10skeletal.yaml')
+gas = ct.Solution('../../mechanism/JP10_Z77.yaml')
 gas.TPY = 1200, ct.one_atm, 'C10H16:0.05,N2:0.95'
 
 Y_fuel_0 = gas.Y[gas.species_index('C10H16')]
@@ -28,7 +28,7 @@ for n in range(10000):
         break
 
 nodedata = np.vstack((states.t, states.T, states.Y.T)).T
-np.savetxt('pyrolysis.dat', nodedata)
+np.savetxt('pyrolysis_Z77.dat', nodedata)
 
 plt.clf()
 plt.subplot(2, 2, 1)

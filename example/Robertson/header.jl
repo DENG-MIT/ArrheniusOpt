@@ -9,6 +9,7 @@ using Random
 using ProgressBars
 using DelimitedFiles
 using Plots, Colors, Printf, Profile
+using LaTeXStrings
 
 BLAS.set_num_threads(4);
 Threads.nthreads() = 4;
@@ -24,6 +25,17 @@ function valid(tsteps, y_true, y_pred; title="", xscale=:log10,
              palette=palette(:darktest, length(weights)))
     plot!(tsteps, (y_true .* weights)', xscale=xscale, line=line1, msw=0.0)
     plot!(tsteps, (y_pred .* weights)', xscale=xscale, line=line2)
+    return h
+end
+
+function compare(tsteps, y_true, y_init, y_pred; title="", xscale=:log10,
+                line1=(3, :scatter), line2=(2, :dash), line3=(2, :solid))
+    # IJulia.clear_output(true)
+    h = plot(legend=false, title=title, size=(400,300), framestyle=:box,
+             palette=palette(:darktest, length(weights)))
+    plot!(tsteps, (y_true .* weights)', xscale=xscale, line=line1, msw=0.0)
+    plot!(tsteps, (y_init .* weights)', xscale=xscale, line=line2, msw=0.0)
+    plot!(tsteps, (y_pred .* weights)', xscale=xscale, line=line3, msw=0.0)
     return h
 end
 
